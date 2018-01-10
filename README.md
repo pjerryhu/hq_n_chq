@@ -2,9 +2,9 @@
 
 ## Overview
 This project is inspired by 
-https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed16365
-and referenced some ideas of this repo 
-https://github.com/nbclark/hqcheat
+https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed16365 . Make sure you read it to understand the general idea.
+I also referenced some ideas of this repo 
+https://github.com/nbclark/hqcheat .
 
 #### py-version/ is for english version
 #### py-c-version/ is for chinese version
