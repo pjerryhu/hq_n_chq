@@ -1,6 +1,12 @@
 # hq_n_chq
 
 ## Overview
+This project is inspired by 
+https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed16365
+and referenced some ideas of this repo 
+https://github.com/nbclark/hqcheat
+
+## Steps
 1. Open quicktime
 2. File->New Movie Recording
 3. Choose your iphone and put the window somewhere convenient
