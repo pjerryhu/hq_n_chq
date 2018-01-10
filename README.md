@@ -6,6 +6,9 @@ https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed
 and referenced some ideas of this repo 
 https://github.com/nbclark/hqcheat
 
+#### py-version/ is for english version
+#### py-c-version/ is for chinese version
+
 ## Steps
 1. Open quicktime
 2. File->New Movie Recording
