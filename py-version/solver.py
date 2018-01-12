@@ -31,7 +31,7 @@ NEGATION = set(['never','no','nothing','nowhere','none','not'
             ,"haven't","hasn't","hadn't","can't","couldn't","shouldn't"
             ,"won't","wouldn't","don't","doesn't","didn't","isn't","aren't", "ain't"])
 
-SCREEN_DIR = "/Users/fanxu/Desktop/Screenshots" 
+SCREEN_DIR = "/Users/pengxianghu/Desktop/Screenshots" 
 IDENTIFIER = "Screen Shot"
 DEBUG = False
 
@@ -92,7 +92,7 @@ def tfSearch(q_terms, option, tfscores):
 def googleAnswer(question):
     # Specify the url
     url = 'https://www.google.com/search?'
-    query = { 'q' : question}
+    query = { 'q' : question.encode('utf-8')}
 
     url += urllib.urlencode(query)
     header = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36' }
@@ -121,7 +121,7 @@ def search(question, options, joined_q_terms):
     url = "https://www.google.com.tr/search?q="
     url = u''.join([url, question]).encode('utf-8')
     # open a web browser to view the search result
-    # webbrowser.open(url)
+    webbrowser.open(url)
 
     result_counts = {}
     app2 = threading.Thread(target=app2Search, args=(question,options,result_counts))
