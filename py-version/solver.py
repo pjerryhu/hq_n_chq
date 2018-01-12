@@ -90,28 +90,31 @@ def tfSearch(q_terms, option, tfscores):
 
 # approach 5: try to find the answer on google directly
 def googleAnswer(question):
-    # Specify the url
-    url = 'https://www.google.com/search?'
-    query = { 'q' : question}
+    try:
+        # Specify the url
+        url = 'https://www.google.com/search?'
+        query = { 'q' : question}
 
-    url += urllib.urlencode(query)
-    header = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36' }
-    # This packages the request (it doesn't make it) 
-    request = urllib2.Request(url, headers=header)
+        url += urllib.urlencode(query)
+        header = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36' }
+        # This packages the request (it doesn't make it) 
+        request = urllib2.Request(url, headers=header)
 
-    # Sends the request and catches the response
-    response = urllib2.urlopen(request)
+        # Sends the request and catches the response
+        response = urllib2.urlopen(request)
 
-    # Extracts the response
-    html = response.read()
+        # Extracts the response
+        html = response.read()
 
-    # data-tts-text="Mauna Kea"
-    pattern = re.compile("data-tts=\"answers\" data-tts-text=\"(.*?)\"")
-    match = pattern.search(html)
-    if match is not None:
-        print crayons.yellow('Find answer: ' + match.group(1))
-    else:
-        print crayons.white('No direct answer.')
+        # data-tts-text="Mauna Kea"
+        pattern = re.compile("data-tts=\"answers\" data-tts-text=\"(.*?)\"")
+        match = pattern.search(html)
+        if match is not None:
+            print crayons.yellow('Find answer: ' + match.group(1))
+        else:
+            print crayons.white('No direct answer.')
+    except:
+        print 'googleAnswer fails'
 
 # overall search handler
 def search(question, options, joined_q_terms):
@@ -207,40 +210,58 @@ def run_solver(screen_shot):
     joined_q_terms = " ".join(q_terms)
     # print joined_q_terms
 
+    # print the parsed question and options
+    print("\n{}\n\n{}\n\n".format(
+        crayons.blue(question),
+        crayons.blue(", ".join(options)),
+    ))
 
     # step 3: do google search with 3 separate approaches
     answer_results = search(question, options, joined_q_terms)
     
 
     # step 4: printing the results
-    print("\n{}\n\n{}\n\n".format(
-        crayons.blue(question),
-        crayons.blue(", ".join(options)),
-    ))
-
-    
-    if sum(answer_results['count'].itervalues()) > 0:
+    sumCount = sum(answer_results['count'].itervalues())
+    if sumCount > 0:
+        threshold = sumCount * 0.3
         if 'what' in question:
             print color.BOLD + "Good for 'what' type question\n" + color.END
         else:
             print(crayons.green("Good for 'what' type question\n"))
-        for key,value in sorted(answer_results['count'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
-            print(crayons.green(key +":"+ str(value)))
+        # for key,value in sorted(answer_results['count'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
+            # print(crayons.green(key +":"+ str(value)))
+        for key,value in answer_results['count'].iteritems():
+            if (negation_flag == 1) != (value > threshold):
+                print(crayons.green(key +":"+ str(value)))
+            else:
+                print(key +":"+ str(value))
 
-    
-    if sum(answer_results['scope'].itervalues()) > 0:
+    sumScope = sum(answer_results['scope'].itervalues()) 
+    if sumScope > 0:
+        threshold = sumScope * 0.3
         if 'which' in question:
             print color.BOLD + "\nGood for 'which' or selection type question\n" + color.END
         else:
             print(crayons.red("\nGood for 'which' or selection type question\n"))
-        for key,value in sorted(answer_results['scope'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
-            print(crayons.red(key +":"+ str(value)))
-
+        # for key,value in sorted(answer_results['scope'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
+            # print(crayons.red(key +":"+ str(value)))
+        for key,value in answer_results['scope'].iteritems():
+            if (negation_flag == 1) != (value > threshold):
+                print(crayons.green(key +":"+ str(value)))
+            else:
+                print(key +":"+ str(value))
     
-    if sum(answer_results['tfscore'].itervalues()) > 0:
+    sumTfscore = sum(answer_results['tfscore'].itervalues())
+    if sumTfscore > 0:
+        threshold = sumTfscore * 0.3
         print(crayons.yellow("\nTerm Frequency excluding question prompt search (cleared the celebrity effect)\n"))
-        for key,value in sorted(answer_results['tfscore'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
-            print(crayons.yellow(key +":"+ str(value)))
+        # for key,value in sorted(answer_results['tfscore'].iteritems(), key=lambda (k,v): (v,k), reverse=True):
+            # print(crayons.yellow(key +":"+ str(value)))
+        for key,value in answer_results['tfscore'].iteritems():
+            if (negation_flag == 1) != (value > threshold):
+                print(crayons.green(key +":"+ str(value)))
+            else:
+                print(key +":"+ str(value))
 
     print(crayons.blue("\nNEGATION_FLAG" if negation_flag == 1 else ""))
 
