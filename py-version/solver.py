@@ -55,10 +55,10 @@ def app2Search(search_term,options, result_counts):
         result_counts[option] = queryRes.count(option.lower()) 
 
 # approach 3: number of search results on question prompt
-def app3Search(joined_q_terms, option, scopes):
+def app3Search(question, option, scopes):
     global MY_API_KEY, MY_CSE_ID
     res = google_search(
-            joined_q_terms+' "'+option+'"', \
+            question+' "'+option+'"', \
             MY_API_KEY, MY_CSE_ID, num=10)
     scopes[option] = int(res['searchInformation']['formattedTotalResults'].replace(",",""))
 
@@ -105,7 +105,7 @@ def search(question, options, joined_q_terms):
     app3ops = {}
     tfops = {}
     for option in options:
-        app3ops[option] = threading.Thread(target=app3Search, args=(joined_q_terms,option,scopes))
+        app3ops[option] = threading.Thread(target=app3Search, args=(question,option,scopes))
         tfops[option] = threading.Thread(target=tfSearch, args=(joined_q_terms.split(" "),option,tfscores))
 
     app2.start()
@@ -134,10 +134,10 @@ def process_image(img):
     img = img.convert("L")
     # threshold = 230
     # below two lines are good for pre-eliminated
-    threshold = 110
+    threshold = 130
     img = img.point(lambda p: p > threshold and 255)
     
-    img.show()
+    # img.show()
     return img
 
 def run_solver(screen_shot):
@@ -175,8 +175,7 @@ def run_solver(screen_shot):
     # query terms: question less stop words
     q_terms = filter(lambda t: t not in STOPWORDS and len(t) > 2, question.split(" "))
     joined_q_terms = " ".join(q_terms)
-    # print joined_q_terms
-
+    # print "joined_q_terms", joined_q_terms
 
     # step 3: do google search with 3 separate approaches
     answer_results = search(question, options, joined_q_terms)
