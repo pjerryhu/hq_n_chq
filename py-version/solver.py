@@ -11,6 +11,8 @@ from PIL import Image, ImageEnhance
 import unicodedata
 import re
 import webbrowser
+import urllib
+import urllib2
 
 class color:
    PURPLE = '\033[95m'
@@ -29,7 +31,7 @@ NEGATION = set(['never','no','nothing','nowhere','none','not'
             ,"haven't","hasn't","hadn't","can't","couldn't","shouldn't"
             ,"won't","wouldn't","don't","doesn't","didn't","isn't","aren't", "ain't"])
 
-SCREEN_DIR = "/Users/pengxianghu/Desktop/Screenshots" 
+SCREEN_DIR = "/Users/fanxu/Desktop/Screenshots" 
 IDENTIFIER = "Screen Shot"
 DEBUG = False
 
@@ -86,14 +88,40 @@ def tfSearch(q_terms, option, tfscores):
     tcp = round(tc * 10000, 2)
     tfscores[option] = tcp
 
+# approach 5: try to find the answer on google directly
+def googleAnswer(question):
+    # Specify the url
+    url = 'https://www.google.com/search?'
+    query = { 'q' : question}
+
+    url += urllib.urlencode(query)
+    header = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36' }
+    # This packages the request (it doesn't make it) 
+    request = urllib2.Request(url, headers=header)
+
+    # Sends the request and catches the response
+    response = urllib2.urlopen(request)
+
+    # Extracts the response
+    html = response.read()
+
+    # data-tts-text="Mauna Kea"
+    pattern = re.compile("data-tts=\"answers\" data-tts-text=\"(.*?)\"")
+    match = pattern.search(html)
+    if match is not None:
+        print crayons.yellow('Find answer: ' + match.group(1))
+    else:
+        print crayons.white('No direct answer.')
 
 # overall search handler
 def search(question, options, joined_q_terms):
+    googleAnswer(question)
     
     # vanilla google search 
     url = "https://www.google.com.tr/search?q="
     url = u''.join([url, question]).encode('utf-8')
-    webbrowser.open(url)
+    # open a web browser to view the search result
+    # webbrowser.open(url)
 
     result_counts = {}
     app2 = threading.Thread(target=app2Search, args=(question,options,result_counts))
@@ -136,7 +164,7 @@ def process_image(img):
     # below two lines are good for pre-eliminated
     threshold = 130
     img = img.point(lambda p: p > threshold and 255)
-    
+    # show the image
     # img.show()
     return img
 
@@ -164,7 +192,8 @@ def run_solver(screen_shot):
     result = unicodedata.normalize('NFKD', result)
 
     # step 2: Parse up the question and answer options
-    parts = result.lower().split("\n\n")
+    parts = result.lower().split("\n")
+    parts = filter(None, parts)
     ind = map(lambda word:"?" in word, parts).index(True)
     question = " ".join(parts[:ind+1]).replace("\n", " ")
     options = parts[ind+1:]
