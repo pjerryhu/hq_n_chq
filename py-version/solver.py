@@ -115,7 +115,7 @@ def googleAnswer(question):
 
 # overall search handler
 def search(question, options, joined_q_terms):
-    googleAnswer(question)
+    
     
     # vanilla google search 
     url = "https://www.google.com.tr/search?q="
@@ -132,6 +132,8 @@ def search(question, options, joined_q_terms):
 
     app3ops = {}
     tfops = {}
+    app5 = threading.Thread(target=googleAnswer, args=(question,))
+    app5.start()
     for option in options:
         app3ops[option] = threading.Thread(target=app3Search, args=(question,option,scopes))
         tfops[option] = threading.Thread(target=tfSearch, args=(joined_q_terms.split(" "),option,tfscores))
@@ -145,6 +147,7 @@ def search(question, options, joined_q_terms):
     for option in options:
         app3ops[option].join()
         tfops[option].join()
+    app5.join()
 
     return {'count':result_counts,'scope': scopes, \
         'tfscore': tfscores}
